@@ -1,5 +1,8 @@
+build:
+	yarn dev
+
 console:
 	docker compose run console
 
-run:
+run: build
 	docker compose up grafana

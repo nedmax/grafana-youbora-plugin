@@ -7,9 +7,9 @@ import {
   FieldType,
 } from '@grafana/data';
 
-
-import { getBackendSrv } from "@grafana/runtime";
+import { getBackendSrv } from '@grafana/runtime';
 import _ from 'lodash';
+import { Md5 } from 'ts-md5/dist/md5';
 import defaults from 'lodash/defaults';
 
 import { MyQuery, MyDataSourceOptions, defaultQuery } from './types';
@@ -27,8 +27,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
-
-    const promises = options.targets.map(async (target) => {
+    const promises = options.targets.map(async target => {
       const query = defaults(target, defaultQuery);
       const response = await this.request('/api/metrics', `query=${query.queryText}`);
 
@@ -65,12 +64,18 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       });
     });
 
-    return Promise.all(promises).then((data) => ({ data }));
+    return Promise.all(promises).then(data => ({ data }));
   }
 
   async request(url: string, params?: string) {
+    const ttl = 20 * 60 * 1000; // 20 minutes in milliseconds
+    const expirationTime = new Date().getTime() + ttl; // in milliseconds
+
+    var preUrl = `${url}?${params?.length ? `${params}` : ''}&dateToken=${expirationTime}`;
+    const token = Md5.hashStr(preUrl + this.apiKey);
+
     return getBackendSrv().datasourceRequest({
-      url: `${this.apiUrl}${url}${params?.length ? `?${params}` : ''}`,
+      url: `${this.apiUrl}${preUrl}&token=${token}`,
     });
   }
 

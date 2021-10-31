@@ -7,8 +7,10 @@ services:
     restart: always
     ports:
       - 80:3000
+    environment:
+      GF_DEFAULT_APP_MODE: development
     volumes:
-      - ./grafana-plugins:/var/lib/grafana/plugins
+      - ./:/var/lib/grafana/plugins/youbora
 
   console:
     image: grafana/grafana:8.2.2
@@ -16,6 +18,8 @@ services:
     ports:
       - 80:3000
     volumes:
-      - ./grafana-plugins:/var/lib/grafana/plugins
+      - ./:/var/lib/grafana/plugins/youbora
+    environment:
+      GF_DEFAULT_APP_MODE: development
     entrypoint: /bin/sh -c
     command: /bin/sh

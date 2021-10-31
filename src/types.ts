@@ -7,7 +7,7 @@ export interface MyQuery extends DataQuery {
 }
 
 export const defaultQuery: Partial<MyQuery> = {
-  queryText: "type=ALL",
+  queryText: 'type=ALL&fromDate=last5minutes',
 };
 
 /**
