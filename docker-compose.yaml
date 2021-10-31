@@ -1,0 +1,21 @@
+version: '3.1'
+
+services:
+
+  grafana:
+    image: grafana/grafana:8.2.2
+    restart: always
+    ports:
+      - 80:3000
+    volumes:
+      - ./grafana-plugins:/var/lib/grafana/plugins
+
+  console:
+    image: grafana/grafana:8.2.2
+    restart: always
+    ports:
+      - 80:3000
+    volumes:
+      - ./grafana-plugins:/var/lib/grafana/plugins
+    entrypoint: /bin/sh -c
+    command: /bin/sh

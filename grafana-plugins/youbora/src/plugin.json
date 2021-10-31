@@ -1,0 +1,39 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "youbora",
+  "id": "nedimar-youbora-datasource",
+  "metrics": true,
+  "info": {
+    "description": "NPAW's Youbora Plugin",
+    "author": {
+      "name": "Nedimar Paulo Turatti",
+      "url": ""
+    },
+    "keywords": [
+      "youbora",
+      "video"
+    ],
+    "logos": {
+      "small": "img/logo.png",
+      "large": "img/logo.png"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/nedmax/grafana-youbora-datasource"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/nedmax/grafana-youbora-datasource/blob/master/LICENSE"
+      }
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=7.0.0",
+    "plugins": []
+  }
+}
