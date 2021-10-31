@@ -10,6 +10,7 @@ services:
     environment:
       GF_DEFAULT_APP_MODE: development
     volumes:
+      - grafana-data:/var/lib/grafana
       - ./:/var/lib/grafana/plugins/youbora
 
   console:
@@ -23,3 +24,6 @@ services:
       GF_DEFAULT_APP_MODE: development
     entrypoint: /bin/sh -c
     command: /bin/sh
+
+volumes:
+  grafana-data:

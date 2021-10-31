@@ -4,6 +4,12 @@
   "name": "Youbora",
   "id": "nedimar-youbora-datasource",
   "metrics": true,
+  "routes": [
+    {
+      "path": "youbora",
+      "url": "https://api.youbora.com"
+    }
+  ],
   "info": {
     "description": "NPAW's Youbora Plugin",
     "author": {

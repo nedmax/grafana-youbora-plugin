@@ -15,15 +15,16 @@ import defaults from 'lodash/defaults';
 import { MyQuery, MyDataSourceOptions, defaultQuery } from './types';
 
 export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
-  apiUrl: string;
-  account: string | undefined;
-  apiKey: string | undefined;
+  apiUrl?: string;
+  account: string;
+  apiClearKey: string;
 
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
     super(instanceSettings);
 
     this.apiUrl = instanceSettings.jsonData.apiUrl!;
-    this.account = instanceSettings.jsonData.account;
+    this.account = instanceSettings.jsonData.account!;
+    this.apiClearKey = instanceSettings.jsonData.apiClearKey!;
   }
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
@@ -72,7 +73,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const expirationTime = new Date().getTime() + ttl; // in milliseconds
 
     var preUrl = `${url}?${params?.length ? `${params}` : ''}&dateToken=${expirationTime}`;
-    const token = Md5.hashStr(preUrl + this.apiKey);
+    const token = Md5.hashStr(`${preUrl}${this.apiClearKey}`);
+    console.log(`DEBUG: ${preUrl}${this.apiClearKey}`);
 
     return getBackendSrv().datasourceRequest({
       url: `${this.apiUrl}${preUrl}&token=${token}`,
@@ -83,10 +85,10 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
    * Checks whether we can connect to the API.
    */
   async testDatasource() {
-    const defaultErrorMessage = 'Cannot connect to API';
+    const defaultErrorMessage = 'Error accessing API';
 
     try {
-      const response = await this.request(`/${this.account}/data`, `fromDate=last5minutes`);
+      const response = await this.request(`/${this.account}/data`, `fromDate=last5minutes&metrics=views`);
       if (response.status === 200) {
         return {
           status: 'success',

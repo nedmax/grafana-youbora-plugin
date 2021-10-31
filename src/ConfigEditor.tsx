@@ -28,6 +28,15 @@ export class ConfigEditor extends PureComponent<Props, State> {
     onOptionsChange({ ...options, jsonData });
   };
 
+  onApiClearKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      apiClearKey: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
   // Secure field (only sent to the backend)
   onAPIKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
@@ -67,7 +76,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
             labelWidth={6}
             inputWidth={20}
             onChange={this.onApiUrlChange}
-            value={jsonData.apiUrl || ''}
+            value={jsonData.apiUrl || 'https://api.youbora.com'}
             placeholder="https://api.youbora.com"
           />
         </div>
@@ -80,6 +89,17 @@ export class ConfigEditor extends PureComponent<Props, State> {
             onChange={this.onAccountChange}
             value={jsonData.account || ''}
             placeholder="Your account identifier at Youbora"
+          />
+        </div>
+
+        <div className="gf-form">
+          <FormField
+            label="Clear API Key"
+            labelWidth={6}
+            inputWidth={20}
+            onChange={this.onApiClearKeyChange}
+            value={jsonData.apiClearKey || ''}
+            placeholder="Clear API Key"
           />
         </div>
 
