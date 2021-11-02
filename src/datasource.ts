@@ -15,22 +15,22 @@ import defaults from 'lodash/defaults';
 import { MyQuery, MyDataSourceOptions, defaultQuery } from './types';
 
 export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
-  apiUrl?: string;
+  url?: string;
   account: string;
-  apiClearKey: string;
+  apiKey: string;
 
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
     super(instanceSettings);
 
-    this.apiUrl = instanceSettings.jsonData.apiUrl!;
+    this.url = instanceSettings.url;
     this.account = instanceSettings.jsonData.account!;
-    this.apiClearKey = instanceSettings.jsonData.apiClearKey!;
+    this.apiKey = instanceSettings.jsonData.apiKey!;
   }
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
     const promises = options.targets.map(async target => {
       const query = defaults(target, defaultQuery);
-      const response = await this.request('/api/metrics', `query=${query.queryText}`);
+      const response = await this.doRequest(`query=${query.queryText}`);
 
       /**
        * In this example, the /api/metrics endpoint returns:
@@ -68,16 +68,18 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     return Promise.all(promises).then(data => ({ data }));
   }
 
-  async request(url: string, params?: string) {
+  async doRequest(params: string) {
     const ttl = 20 * 60 * 1000; // 20 minutes in milliseconds
     const expirationTime = new Date().getTime() + ttl; // in milliseconds
+    const basePath = `/${this.account}/data`;
 
-    var preUrl = `${url}?${params?.length ? `${params}` : ''}&dateToken=${expirationTime}`;
-    const token = Md5.hashStr(`${preUrl}${this.apiClearKey}`);
-    console.log(`DEBUG: ${preUrl}${this.apiClearKey}`);
+    var parsedParams = `${params}&dateToken=${expirationTime}`;
+    const token = Md5.hashStr(`${basePath}?${parsedParams}${this.apiKey}`);
+    console.log(`DEBUG: ${this.apiKey}`);
 
     return getBackendSrv().datasourceRequest({
-      url: `${this.apiUrl}${preUrl}&token=${token}`,
+      url: `${this.url}${basePath}?${parsedParams}&token=${token}`,
+      method: 'GET',
     });
   }
 
@@ -88,7 +90,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const defaultErrorMessage = 'Error accessing API';
 
     try {
-      const response = await this.request(`/${this.account}/data`, `fromDate=last5minutes&metrics=views`);
+      const response = await this.doRequest(`fromDate=last5minutes&metrics=views`);
       if (response.status === 200) {
         return {
           status: 'success',
