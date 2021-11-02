@@ -1,3 +1,6 @@
+setup:
+	yard install
+
 build:
 	yarn dev
 
