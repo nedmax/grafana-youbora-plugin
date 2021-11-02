@@ -1,12 +1,24 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 export interface MyQuery extends DataQuery {
-  queryText?: string;
+  filter?: string;
+  timezone: string;
+  metrics: string;
+  fromDate: string;
+  toDate?: string;
+  granularity: string;
+  type: string;
 }
 
 export const defaultQuery: Partial<MyQuery> = {
-  queryText: 'type=ALL&fromDate=last5minutes',
+  filter: '',
+  timezone: 'GMT',
+  granularity: 'minute',
+  metrics: 'views',
+  fromDate: 'last6hours',
 };
+
+export const MyParams = ['filter', 'timezone', 'granularity', 'fromDate', 'metrics', 'toDate'];
 
 /**
  * These are options configured for each DataSource instance

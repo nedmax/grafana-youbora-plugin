@@ -8,11 +8,11 @@ import {
 } from '@grafana/data';
 
 import { getBackendSrv } from '@grafana/runtime';
-import _ from 'lodash';
+import _, { keys } from 'lodash';
 import { Md5 } from 'ts-md5/dist/md5';
 import defaults from 'lodash/defaults';
 
-import { MyQuery, MyDataSourceOptions, defaultQuery } from './types';
+import { MyQuery, MyDataSourceOptions, defaultQuery, MyParams } from './types';
 
 export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   url?: string;
@@ -29,31 +29,20 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
     const promises = options.targets.map(async target => {
+      const { range } = options;
       const query = defaults(target, defaultQuery);
-      const response = await this.doRequest({ query: query.queryText });
+      query.fromDate = range!.from.valueOf().toString();
+      query.toDate = range!.to.valueOf().toString();
+      const response = await this.doRequest(query);
 
-      /**
-       * In this example, the /api/metrics endpoint returns:
-       *
-       * {
-       *   "datapoints": [
-       *     {
-       *       Time: 1234567891011,
-       *       Value: 12.5
-       *     },
-       *     {
-       *     ...
-       *   ]
-       * }
-       */
-      const datapoints = response.data.datapoints;
+      const datapoints = response.data.data[0].metrics[0].values[0].data;
 
       const timestamps: number[] = [];
       const values: number[] = [];
 
       for (let i = 0; i < datapoints.length; i++) {
-        timestamps.push(datapoints[i].Time);
-        values.push(datapoints[i].Value);
+        timestamps.push(datapoints[i][0]);
+        values.push(datapoints[i][1]);
       }
 
       return new MutableDataFrame({
@@ -72,11 +61,16 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const ttl = 20 * 60 * 1000; // 20 minutes in milliseconds
     const expirationTime = new Date().getTime() + ttl; // in milliseconds
     const basePath = `/${this.account}/data`;
-    const baseParams = `dateToken=${expirationTime}&${new URLSearchParams(params).toString()}`;
+    let orderedParams = '';
+    keys(params)
+      .sort()
+      .filter(e => MyParams.includes(e))
+      .forEach(e => (orderedParams += `&${e}=${params[e]}`));
+    console.log(orderedParams);
+
+    const baseParams = `dateToken=${expirationTime}${orderedParams}`;
     const baseToken = `${basePath}?${baseParams}`;
     const token = Md5.hashStr(`${baseToken}${this.apiKey}`);
-    console.log(`${baseToken}${this.apiKey}`);
-    console.log(token);
 
     return getBackendSrv().datasourceRequest({
       url: `${this.url}/youbora${basePath}?${baseParams}&token=${token}`,
