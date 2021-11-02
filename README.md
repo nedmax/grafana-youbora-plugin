@@ -42,4 +42,4 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
 - [Grafana UI Library](https://developers.grafana.com/ui) - UI components to help you build interfaces using Grafana Design System
 
 ## TODO
-- Use data source proxy and encrypted key
+- Use backend datasource proxy and encrypted key

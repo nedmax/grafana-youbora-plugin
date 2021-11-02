@@ -30,7 +30,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
     const promises = options.targets.map(async target => {
       const query = defaults(target, defaultQuery);
-      const response = await this.doRequest(`query=${query.queryText}`);
+      const response = await this.doRequest({ query: query.queryText });
 
       /**
        * In this example, the /api/metrics endpoint returns:
@@ -68,17 +68,18 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     return Promise.all(promises).then(data => ({ data }));
   }
 
-  async doRequest(params: string) {
+  async doRequest(params: Record<string, any>) {
     const ttl = 20 * 60 * 1000; // 20 minutes in milliseconds
     const expirationTime = new Date().getTime() + ttl; // in milliseconds
     const basePath = `/${this.account}/data`;
-
-    var parsedParams = `${params}&dateToken=${expirationTime}`;
-    const token = Md5.hashStr(`${basePath}?${parsedParams}${this.apiKey}`);
-    console.log(`DEBUG: ${this.apiKey}`);
+    const baseParams = `dateToken=${expirationTime}&${new URLSearchParams(params).toString()}`;
+    const baseToken = `${basePath}?${baseParams}`;
+    const token = Md5.hashStr(`${baseToken}${this.apiKey}`);
+    console.log(`${baseToken}${this.apiKey}`);
+    console.log(token);
 
     return getBackendSrv().datasourceRequest({
-      url: `${this.url}${basePath}?${parsedParams}&token=${token}`,
+      url: `${this.url}/youbora${basePath}?${baseParams}&token=${token}`,
       method: 'GET',
     });
   }
@@ -90,7 +91,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const defaultErrorMessage = 'Error accessing API';
 
     try {
-      const response = await this.doRequest(`fromDate=last5minutes&metrics=views`);
+      const response = await this.doRequest({ fromDate: 'last5minutes', metrics: 'views' });
       if (response.status === 200) {
         return {
           status: 'success',
