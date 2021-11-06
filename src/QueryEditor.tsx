@@ -18,6 +18,13 @@ export class QueryEditor extends PureComponent<Props> {
     onRunQuery();
   };
 
+  onTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onChange, query, onRunQuery } = this.props;
+    onChange({ ...query, type: event.target.value });
+    // executes the query
+    onRunQuery();
+  };
+
   render() {
     const query = defaults(this.props.query, defaultQuery);
 
@@ -29,6 +36,13 @@ export class QueryEditor extends PureComponent<Props> {
           onChange={this.onFilterChange}
           label="Filter"
           tooltip="Youbora filter"
+        />
+        <FormField
+          labelWidth={8}
+          value={query.type || ''}
+          onChange={this.onTypeChange}
+          label="Type"
+          tooltip="Streaming type"
         />
       </div>
     );
