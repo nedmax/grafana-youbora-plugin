@@ -14,7 +14,7 @@
     "description": "NPAW's Youbora Plugin",
     "author": {
       "name": "Nedimar Paulo Turatti",
-      "url": ""
+      "url": "https://github.com/nedmax"
     },
     "keywords": [
       "youbora",
@@ -31,10 +31,19 @@
       },
       {
         "name": "License",
-        "url": "https://github.com/nedmax/grafana-youbora-plugin/blob/master/LICENSE"
+        "url": "https://github.com/nedmax/grafana-youbora-plugin/blob/main/LICENSE"
       }
     ],
-    "screenshots": [],
+    "screenshots": [
+      {
+        "name": "Dashboard",
+        "path": "img/screenshot-dashboard1.png"
+      },
+      {
+        "name": "Query Edit",
+        "path": "img/screenshot-edit1.png"
+      }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
