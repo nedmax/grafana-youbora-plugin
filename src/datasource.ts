@@ -27,31 +27,29 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     this.apiKey = instanceSettings.jsonData.apiKey!;
   }
 
-  async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
-    const promises = options.targets.map(async target => {
-      const { range } = options;
+  async query(request: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
+    const promises = request.targets.map(async target => {
+      const { range } = request;
       const query = defaults(target, defaultQuery);
       query.fromDate = range!.from.valueOf().toString();
       query.toDate = range!.to.valueOf().toString();
       const response = await this.doRequest(query);
 
-      const datapoints = response.data.data[0].metrics[0].values[0].data;
+      const datapoints = response.data.data;
 
-      const timestamps: number[] = [];
-      const values: number[] = [];
+      const timestamps: number[] = datapoints[0].metrics[0].values[0].data.map((x: number[]) => x[0]);
+      const dataframe = new MutableDataFrame({
+        refId: query.refId,
+        fields: [{ name: 'Time', type: FieldType.time, values: timestamps }],
+      });
 
       for (let i = 0; i < datapoints.length; i++) {
-        timestamps.push(datapoints[i][0]);
-        values.push(datapoints[i][1]);
+        const values: number[] = datapoints[i].metrics[0].values[0].data.map((x: number[]) => x[1]);
+        const name = `${datapoints[i].type} ${datapoints[i].metrics[0].label}`;
+        dataframe.addField({ name: name, type: FieldType.number, values: values });
       }
 
-      return new MutableDataFrame({
-        refId: query.refId,
-        fields: [
-          { name: 'Time', type: FieldType.time, values: timestamps },
-          { name: 'Value', type: FieldType.number, values: values },
-        ],
-      });
+      return dataframe;
     });
 
     return Promise.all(promises).then(data => ({ data }));
@@ -66,7 +64,6 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       .sort()
       .filter(e => MyParams.includes(e))
       .forEach(e => (orderedParams += `&${e}=${params[e]}`));
-    console.log(orderedParams);
 
     const baseParams = `dateToken=${expirationTime}${orderedParams}`;
     const baseToken = `${basePath}?${baseParams}`;

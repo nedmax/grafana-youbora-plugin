@@ -25,6 +25,13 @@ export class QueryEditor extends PureComponent<Props> {
     onRunQuery();
   };
 
+  onMetricsChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onChange, query, onRunQuery } = this.props;
+    onChange({ ...query, metrics: event.target.value });
+    // executes the query
+    onRunQuery();
+  };
+
   render() {
     const query = defaults(this.props.query, defaultQuery);
 
@@ -42,7 +49,14 @@ export class QueryEditor extends PureComponent<Props> {
           value={query.type || ''}
           onChange={this.onTypeChange}
           label="Type"
-          tooltip="Streaming type"
+          tooltip="Streaming type (ALL, LIVE or VOD)"
+        />
+        <FormField
+          labelWidth={8}
+          value={query.metrics || ''}
+          onChange={this.onMetricsChange}
+          label="Metrics"
+          tooltip="Examples: views"
         />
       </div>
     );

@@ -44,3 +44,4 @@ This plugin enables Youbora API as a data source for Grafana.
 
 ## TODO
 - Use backend datasource proxy and encrypted key
+- Add query editor selectors for metrics, type, groupby, etc
