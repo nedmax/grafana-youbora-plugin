@@ -1,0 +1,38 @@
+{
+    "messages": [],
+    "data": [
+        {
+            "name": "",
+            "type": "ALL",
+            "date": [
+                1646152500000,
+                1646174100000
+            ],
+            "dimensions": [],
+            "metrics": [
+                {
+                    "values": [
+                        {
+                            "data": [
+                                {
+                                    "value": 12554369
+                                }
+                            ]
+                        }
+                    ],
+                    "code": "views",
+                    "label": "Plays",
+                    "magnitudes": {
+                        "x": "None",
+                        "y": "Plays"
+                    }
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "account": "globo",
+        "timestamp": 1646174131446,
+        "refresh": 55
+    }
+}

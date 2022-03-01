@@ -10,11 +10,11 @@ interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions> 
 interface State {}
 
 export class ConfigEditor extends PureComponent<Props, State> {
-  onPathChange = (event: ChangeEvent<HTMLInputElement>) => {
+  onAccountChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
     const jsonData = {
       ...options.jsonData,
-      path: event.target.value,
+      account: event.target.value,
     };
     onOptionsChange({ ...options, jsonData });
   };
@@ -25,7 +25,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
     onOptionsChange({
       ...options,
       secureJsonData: {
-        apiKey: event.target.value,
+        apikey: event.target.value,
       },
     });
   };
@@ -36,11 +36,11 @@ export class ConfigEditor extends PureComponent<Props, State> {
       ...options,
       secureJsonFields: {
         ...options.secureJsonFields,
-        apiKey: false,
+        apikey: false,
       },
       secureJsonData: {
         ...options.secureJsonData,
-        apiKey: '',
+        apikey: '',
       },
     });
   };
@@ -54,22 +54,22 @@ export class ConfigEditor extends PureComponent<Props, State> {
       <div className="gf-form-group">
         <div className="gf-form">
           <FormField
-            label="Path"
+            label="Account"
             labelWidth={6}
             inputWidth={20}
-            onChange={this.onPathChange}
-            value={jsonData.path || ''}
-            placeholder="json field returned to frontend"
+            onChange={this.onAccountChange}
+            value={jsonData.account || ''}
+            placeholder="Your account identifier at Youbora"
           />
         </div>
 
         <div className="gf-form-inline">
           <div className="gf-form">
             <SecretFormField
-              isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
-              value={secureJsonData.apiKey || ''}
+              isConfigured={(secureJsonFields && secureJsonFields.apikey) as boolean}
+              value={secureJsonData.apikey || ''}
               label="API Key"
-              placeholder="secure json field (backend only)"
+              placeholder="Your Youbora API key"
               labelWidth={6}
               inputWidth={20}
               onReset={this.onResetAPIKey}

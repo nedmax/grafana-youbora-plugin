@@ -5,6 +5,7 @@ setup:
 	go mod tidy
 
 build:
+	yarn build
 	mage -v
 
 run: build
