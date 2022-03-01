@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+
+  grafana:
+    image: grafana/grafana:8.2.2
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      GF_DEFAULT_APP_MODE: "development"
+      GF_DATAPROXY_LOGGING: "true"
+      GF_LOG_LEVEL: "debug"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./:/var/lib/grafana/plugins/youbora-datasource
+
+  console:
+    image: grafana/grafana:8.2.2
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/var/lib/grafana/plugins/youbora-datasource
+    environment:
+      GF_DEFAULT_APP_MODE: "development"
+    entrypoint: /bin/sh -c
+    command: /bin/sh
+
+volumes:
+  grafana-data:

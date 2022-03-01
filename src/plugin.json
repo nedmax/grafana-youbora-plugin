@@ -1,0 +1,51 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "youbora",
+  "id": "nedimar-youbora-datasource",
+  "metrics": true,
+  "backend": true,
+  "executable": "gpx_youbora",
+  "info": {
+    "description": "NPAW's Youbora data source plugin",
+    "author": {
+      "name": "Nedimar Paulo Turatti",
+      "url": "https://github.com/nedmax/grafana-youbora-plugin"
+    },
+    "keywords": [
+      "youbora",
+      "datasource",
+      "backend"
+    ],
+    "logos": {
+      "small": "img/logo.png",
+      "large": "img/logo.png"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/nedmax/grafana-youbora-plugin"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/grafana/grafana-starter-datasource-backend/blob/master/LICENSE"
+      }
+    ],
+    "screenshots": [
+      {
+        "name": "Dashboard",
+        "path": "img/screenshot-dashboard1.png"
+      },
+      {
+        "name": "Query Edit",
+        "path": "img/screenshot-edit1.png"
+      }
+    ],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=7.0.0",
+    "plugins": []
+  }
+}
