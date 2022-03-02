@@ -35,7 +35,25 @@ type Metric struct {
 }
 
 type Value struct {
-	Points []struct {
-		Value float64 `json:"value,omitempty"`
-	} `json:"data,omitempty"`
+	Points [][2]float64 `json:"data,omitempty"`
+}
+
+type YouboraDataSource struct {
+	apikey  string
+	baseurl string
+	account string
+}
+
+type JsonData struct {
+	Account string `json:"account"`
+}
+
+type queryModel struct {
+	FromDate    string `json:"fromDate"`
+	ToDate      string `json:"toDate"`
+	Filter      string `json:"filter"`
+	Type        string `json:"type"`
+	Metrics     string `json:"metrics"`
+	Timezone    string `json:"timezone"`
+	Granularity string `json:"granularity"`
 }

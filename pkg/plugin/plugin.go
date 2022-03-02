@@ -40,8 +40,8 @@ var httpClient = &http.Client{
 		},
 		Proxy: http.ProxyFromEnvironment,
 		Dial: (&net.Dialer{
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
+			Timeout:   3 * time.Second,
+			KeepAlive: 3 * time.Second,
 			DualStack: true,
 		}).Dial,
 		TLSHandshakeTimeout:   10 * time.Second,
@@ -49,17 +49,7 @@ var httpClient = &http.Client{
 		MaxIdleConns:          100,
 		IdleConnTimeout:       90 * time.Second,
 	},
-	Timeout: time.Duration(time.Second * 30),
-}
-
-type YouboraDataSource struct {
-	apikey  string
-	baseurl string
-	account string
-}
-
-type JsonData struct {
-	Account string `json:"account"`
+	Timeout: time.Duration(time.Second * 5),
 }
 
 // NewYouboraDataSource creates a new datasource instance.
@@ -107,15 +97,6 @@ func (d *YouboraDataSource) QueryData(ctx context.Context, req *backend.QueryDat
 	return response, nil
 }
 
-type queryModel struct {
-	FromDate    string `json:"fromDate"`
-	Filter      string `json:"filter"`
-	Type        string `json:"type"`
-	Metrics     string `json:"metrics"`
-	Timezone    string `json:"timezone"`
-	Granularity string `json:"granularity"`
-}
-
 func (d *YouboraDataSource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 	response := backend.DataResponse{}
 
@@ -127,16 +108,11 @@ func (d *YouboraDataSource) query(ctx context.Context, pCtx backend.PluginContex
 		return response
 	}
 
-	// create data frame response.
-	frame := data.NewFrame("response")
+	// setup other query parameters.
+	qm.FromDate = fmt.Sprintf("%d", query.TimeRange.From.UnixNano()/int64(time.Millisecond))
+	qm.ToDate = fmt.Sprintf("%d", query.TimeRange.To.UnixNano()/int64(time.Millisecond))
 
-	// add fields.
-	frame.Fields = append(frame.Fields,
-		data.NewField("time", nil, []time.Time{query.TimeRange.From, query.TimeRange.To}),
-		data.NewField("values", nil, []int64{10, 20}),
-	)
-
-	// query Youbora API
+	// query Youbora API.
 	var yr YouboraResponse
 	body, err := d.doRequest(ctx, &qm)
 	if err != nil {
@@ -147,6 +123,21 @@ func (d *YouboraDataSource) query(ctx context.Context, pCtx backend.PluginContex
 		response.Error = err
 		return response
 	}
+
+	// create data frame response.
+	frame := data.NewFrame("response")
+
+	// add fields.
+	x, y, err := ParseYouboraResponse(&yr)
+	if err != nil {
+		response.Error = err
+		return response
+	}
+
+	frame.Fields = append(frame.Fields,
+		data.NewField("time", nil, x),
+		data.NewField(yr.Data[0].Metrics[0].Label, nil, y),
+	)
 
 	// add the frames to the response.
 	response.Frames = append(response.Frames, frame)
@@ -188,13 +179,16 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *queryModel) (body
 
 	basePath := fmt.Sprintf("/%s/data", d.account)
 	orderedParams := fmt.Sprintf(
-		"fromDate=%s&metrics=%s&type=%s&timezone=%s&%s",
+		"fromDate=%s&metrics=%s&type=%s&timezone=%s&granularity=%s",
 		qm.FromDate,
 		qm.Metrics,
 		qm.Type,
 		qm.Timezone,
 		qm.Granularity,
 	)
+	if qm.ToDate != "" {
+		orderedParams = orderedParams + fmt.Sprintf("&toDate=%s", qm.ToDate)
+	}
 
 	baseParams := fmt.Sprintf("dateToken=%d&%s", expirationTime, orderedParams)
 	baseToken := fmt.Sprintf("%s?%s", basePath, baseParams)
@@ -211,7 +205,7 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *queryModel) (body
 	defer resp.Body.Close()
 	body, err = io.ReadAll(resp.Body)
 
-	log.DefaultLogger.Info("DATA", "data", string(body))
+	log.DefaultLogger.Debug("DATA", "data", string(body))
 
 	return body, nil
 }

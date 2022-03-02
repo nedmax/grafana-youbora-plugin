@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
+	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-starter-datasource-backend/pkg/plugin"
@@ -52,11 +53,20 @@ func TestReadResponseData(t *testing.T) {
 		t.Errorf("%v: output doesn't match expected result", result)
 	}
 
-	if result.Data[0].Date[0] != 1646152500000 {
+	if result.Data[0].Date[0] != 1646220720000 {
 		t.Errorf("%v: output doesn't match expected result", result)
 	}
 
-	if result.Data[0].Metrics[0].Values[0].Points[0].Value != 12554369 {
+	x, y, err := plugin.ParseYouboraResponse(&result)
+	if err != nil {
+		t.Fatalf("%v: error parsing Youbora response", result)
+	}
+
+	if x[0] != time.Unix(1646220720, 0) {
+		t.Errorf("%v: output doesn't match expected result", result)
+	}
+
+	if y[0] != 15655 {
 		t.Errorf("%v: output doesn't match expected result", result)
 	}
 
