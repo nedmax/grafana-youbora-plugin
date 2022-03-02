@@ -15,7 +15,6 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
-	"github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
 // Make sure YouboraDataSource implements required interfaces. This is important to do
@@ -99,21 +98,16 @@ func (d *YouboraDataSource) QueryData(ctx context.Context, req *backend.QueryDat
 
 func (d *YouboraDataSource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 	response := backend.DataResponse{}
+	qm := QueryModel{}
+	yr := YouboraResponse{}
 
 	// Unmarshal the JSON into our queryModel.
-	var qm queryModel
-
-	response.Error = json.Unmarshal(query.JSON, &qm)
+	response.Error = ParseQuery(query, &qm)
 	if response.Error != nil {
 		return response
 	}
 
-	// setup other query parameters.
-	qm.FromDate = fmt.Sprintf("%d", query.TimeRange.From.UnixNano()/int64(time.Millisecond))
-	qm.ToDate = fmt.Sprintf("%d", query.TimeRange.To.UnixNano()/int64(time.Millisecond))
-
 	// query Youbora API.
-	var yr YouboraResponse
 	body, err := d.doRequest(ctx, &qm)
 	if err != nil {
 		response.Error = err
@@ -125,22 +119,14 @@ func (d *YouboraDataSource) query(ctx context.Context, pCtx backend.PluginContex
 	}
 
 	// create data frame response.
-	frame := data.NewFrame("response")
-
-	// add fields.
-	x, y, err := ParseYouboraResponse(&yr)
+	frames, err := ParseYouboraResponse(&yr)
 	if err != nil {
 		response.Error = err
 		return response
 	}
 
-	frame.Fields = append(frame.Fields,
-		data.NewField("time", nil, x),
-		data.NewField(yr.Data[0].Metrics[0].Label, nil, y),
-	)
-
 	// add the frames to the response.
-	response.Frames = append(response.Frames, frame)
+	response.Frames = frames
 
 	return response
 }
@@ -153,7 +139,7 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 	log.DefaultLogger.Info("CheckHealth called", "request", req)
 	var status = backend.HealthStatusOk
 	var message = "Data source is working"
-	var qm = &queryModel{
+	var qm = &QueryModel{
 		Metrics:  "views",
 		FromDate: "last5minutes",
 	}
@@ -172,7 +158,7 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 	}, nil
 }
 
-func (d *YouboraDataSource) doRequest(ctx context.Context, qm *queryModel) (body []byte, err error) {
+func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body []byte, err error) {
 
 	const ttl = 20 * 60 * 1000 // 20 minutes in milliseconds
 	expirationTime := (time.Now().UnixNano() / int64(time.Millisecond)) + ttl

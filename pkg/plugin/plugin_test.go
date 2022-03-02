@@ -32,7 +32,7 @@ func TestQueryData(t *testing.T) {
 	}
 }
 
-func TestReadResponseData(t *testing.T) {
+func TestSimpleViews(t *testing.T) {
 	b, err := ioutil.ReadFile("testdata/simple_views.json")
 	if err != nil {
 		t.Fatal(err)
@@ -42,7 +42,7 @@ func TestReadResponseData(t *testing.T) {
 	err = json.Unmarshal(b, &result)
 
 	if err != nil {
-		t.Error(err)
+		t.Errorf("%v: error parsing JSON", string(b))
 	}
 
 	if len(result.Messages) > 0 {
@@ -57,17 +57,76 @@ func TestReadResponseData(t *testing.T) {
 		t.Errorf("%v: output doesn't match expected result", result)
 	}
 
-	x, y, err := plugin.ParseYouboraResponse(&result)
+	frames, err := plugin.ParseYouboraResponse(&result)
 	if err != nil {
 		t.Fatalf("%v: error parsing Youbora response", result)
 	}
 
-	if x[0] != time.Unix(1646220720, 0) {
-		t.Errorf("%v: output doesn't match expected result", result)
+	if frames[0].Fields[0].At(0) != time.Unix(1646220720, 0) {
+		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[0].At(0), time.Unix(1646220720, 0))
 	}
 
-	if y[0] != 15655 {
-		t.Errorf("%v: output doesn't match expected result", result)
+	if frames[0].Fields[1].At(0) != float64(15655) {
+		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[1].At(0), 15655)
+	}
+
+}
+
+func TestDoubleData(t *testing.T) {
+	b, err := ioutil.ReadFile("testdata/double_data.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var result plugin.YouboraResponse
+	err = json.Unmarshal(b, &result)
+	if err != nil {
+		t.Errorf("%v: error parsing JSON", string(b))
+	}
+
+	frames, err := plugin.ParseYouboraResponse(&result)
+	if err != nil {
+		t.Fatalf("%v: error parsing Youbora response", result)
+	}
+
+	if frames[0].Fields[0].At(0) != time.Unix(1646232180, 0) {
+		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[0].At(0), time.Unix(1646220720, 0))
+	}
+
+	if frames[0].Fields[1].At(0) != float64(27585) {
+		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[1].At(0), 27585)
+	}
+
+	if frames[0].Fields[1].Name != "ALL Plays" {
+		t.Errorf("%v: output doesn't match expected result", frames[0].Fields[1].Name)
+	}
+
+	if frames[0].Fields[3].Name != "ALL Concurrent Plays" {
+		t.Errorf("%v: output doesn't match expected result", frames[0].Fields[3].Name)
+	}
+
+}
+
+func TestParseQuery(t *testing.T) {
+	b, err := ioutil.ReadFile("testdata/query.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var qm plugin.QueryModel
+	var query backend.DataQuery
+	query.JSON = b
+	err = plugin.ParseQuery(query, &qm)
+
+	if err != nil {
+		t.Errorf("%v: error parsing JSON", string(b))
+	}
+
+	if qm.Type != "ALL,VOD" {
+		t.Errorf("%v: output doesn't match expected result", qm.Type)
+	}
+
+	if qm.Metrics != "views,concurrent" {
+		t.Errorf("%v: output doesn't match expected result", qm.Metrics)
 	}
 
 }

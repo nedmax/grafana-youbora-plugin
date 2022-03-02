@@ -13,7 +13,7 @@ type Message struct {
 
 type Datum struct {
 	Name    string    `json:"name,omitempty"`
-	Type    string    `json:"type,omitempty"`
+	Type    string    `json:"type"`
 	Date    []float64 `json:"date"`
 	Metrics []Metric  `json:"metrics,omitempty"`
 }
@@ -48,10 +48,10 @@ type JsonData struct {
 	Account string `json:"account"`
 }
 
-type queryModel struct {
+type QueryModel struct {
 	FromDate    string `json:"fromDate"`
-	ToDate      string `json:"toDate"`
-	Filter      string `json:"filter"`
+	ToDate      string `json:"toDate,omitempty"`
+	Filter      string `json:"filter,omitempty"`
 	Type        string `json:"type"`
 	Metrics     string `json:"metrics"`
 	Timezone    string `json:"timezone"`
