@@ -1,3 +1,7 @@
+clean:
+	mage clean
+	rm -f dist
+
 setup:
 	yarn install
 	yarn build

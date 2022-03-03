@@ -1,34 +1,47 @@
 import { defaults } from 'lodash';
 
-import React, { ChangeEvent, PureComponent } from 'react';
-import { LegacyForms } from '@grafana/ui';
-import { QueryEditorProps } from '@grafana/data';
+import React, { PureComponent } from 'react';
+import { InlineFormLabel, Select } from '@grafana/ui';
+import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from './datasource';
 import { defaultQuery, MyDataSourceOptions, MyQuery } from './types';
 
-const { FormField } = LegacyForms;
-
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
+const filterOptions: Array<SelectableValue<string>> = [
+  { label: 'start_date', value: 'start_date' },
+  { label: 'name', value: 'name' },
+  { label: 'distance', value: 'distance' },
+  { label: 'moving_time', value: 'moving_time' },
+];
+
+const metricsOptions: Array<SelectableValue<string>> = [
+  { label: 'Plays', value: 'views' },
+  { label: 'Unique Views', value: 'uniques' },
+];
+
+const typeOptions: Array<SelectableValue<string>> = [
+  { label: 'All', value: 'ALL' },
+  { label: 'VoD', value: 'VOD' },
+  { label: 'Live', value: 'LIVE' },
+];
+
 export class QueryEditor extends PureComponent<Props> {
-  onFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
+  onFilterChange = (option: SelectableValue<string>) => {
     const { onChange, query, onRunQuery } = this.props;
-    onChange({ ...query, filter: event.target.value });
-    // executes the query
+    onChange({ ...query, filter: option.value });
     onRunQuery();
   };
 
-  onTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
+  onMetricsChange = (option: SelectableValue<string>) => {
     const { onChange, query, onRunQuery } = this.props;
-    onChange({ ...query, type: event.target.value });
-    // executes the query
+    onChange({ ...query, metrics: option.value });
     onRunQuery();
   };
 
-  onMetricsChange = (event: ChangeEvent<HTMLInputElement>) => {
+  onTypeChange = (option: SelectableValue<string>) => {
     const { onChange, query, onRunQuery } = this.props;
-    onChange({ ...query, metrics: event.target.value });
-    // executes the query
+    onChange({ ...query, type: option.value });
     onRunQuery();
   };
 
@@ -36,29 +49,38 @@ export class QueryEditor extends PureComponent<Props> {
     const query = defaults(this.props.query, defaultQuery);
 
     return (
-      <div className="gf-form">
-        <FormField
-          labelWidth={8}
-          value={query.filter || ''}
-          onChange={this.onFilterChange}
-          label="Filter"
-          tooltip="Youbora filter"
-        />
-        <FormField
-          labelWidth={8}
-          value={query.type || ''}
-          onChange={this.onTypeChange}
-          label="Type"
-          tooltip="Streaming type (ALL, LIVE or VOD)"
-        />
-        <FormField
-          labelWidth={8}
-          value={query.metrics || ''}
-          onChange={this.onMetricsChange}
-          label="Metrics"
-          tooltip="Examples: views"
-        />
-      </div>
+      <>
+        <div className="gf-form-inline">
+          <InlineFormLabel width={12}>&nbsp;</InlineFormLabel>
+          <InlineFormLabel width={5}>Filter</InlineFormLabel>
+          <Select
+            isSearchable={true}
+            width={33}
+            value={query.filter || ''}
+            options={filterOptions}
+            onChange={this.onFilterChange}
+          />
+          <InlineFormLabel width={5}>Metrics</InlineFormLabel>
+          <Select
+            isSearchable={true}
+            width={33}
+            value={query.metrics || ''}
+            options={metricsOptions}
+            onChange={this.onMetricsChange}
+          />
+          <InlineFormLabel width={5}>Type</InlineFormLabel>
+          <Select
+            isSearchable={true}
+            width={33}
+            value={query.metrics || ''}
+            options={typeOptions}
+            onChange={this.onTypeChange}
+          />
+          <div className="gf-form gf-form--grow">
+            <div className="gf-form-label gf-form-label--grow" />
+          </div>
+        </div>
+      </>
     );
   }
 }
