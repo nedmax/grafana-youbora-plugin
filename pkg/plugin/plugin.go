@@ -165,11 +165,10 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body
 
 	basePath := fmt.Sprintf("/%s/data", d.account)
 	orderedParams := fmt.Sprintf(
-		"fromDate=%s&metrics=%s&type=%s&timezone=%s&granularity=%s",
+		"fromDate=%s&metrics=%s&type=%s&timezone=GMT&granularity=%s",
 		qm.FromDate,
 		qm.Metrics,
 		qm.Type,
-		qm.Timezone,
 		qm.Granularity,
 	)
 	if qm.ToDate != "" {
@@ -190,8 +189,6 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body
 
 	defer resp.Body.Close()
 	body, err = io.ReadAll(resp.Body)
-
-	log.DefaultLogger.Debug("DATA", "data", string(body))
 
 	return body, nil
 }

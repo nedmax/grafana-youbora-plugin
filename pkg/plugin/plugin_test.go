@@ -97,12 +97,12 @@ func TestDoubleData(t *testing.T) {
 		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[1].At(0), 27585)
 	}
 
-	if frames[0].Fields[1].Name != "ALL Plays" {
+	if frames[0].Fields[1].Name != "Plays" {
 		t.Errorf("%v: output doesn't match expected result", frames[0].Fields[1].Name)
 	}
 
-	if frames[0].Fields[3].Name != "ALL Concurrent Plays" {
-		t.Errorf("%v: output doesn't match expected result", frames[0].Fields[3].Name)
+	if frames[0].Fields[2].Name != "Concurrent Plays" {
+		t.Errorf("%v: output doesn't match expected result", frames[0].Fields[2].Name)
 	}
 
 }

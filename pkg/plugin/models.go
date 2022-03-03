@@ -49,11 +49,10 @@ type JsonData struct {
 }
 
 type QueryModel struct {
-	FromDate    string `json:"fromDate"`
-	ToDate      string `json:"toDate,omitempty"`
+	FromDate    string
+	ToDate      string
 	Filter      string `json:"filter,omitempty"`
 	Type        string `json:"type"`
 	Metrics     string `json:"metrics"`
-	Timezone    string `json:"timezone"`
-	Granularity string `json:"granularity"`
+	Granularity string
 }
