@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
+	"strings"
 	"testing"
 	"time"
 
@@ -121,8 +122,8 @@ func TestParseQuery(t *testing.T) {
 		t.Errorf("%v: error parsing JSON", string(b))
 	}
 
-	if qm.Type != "ALL,VOD" {
-		t.Errorf("%v: output doesn't match expected result", qm.Type)
+	if strings.Join(qm.StreamingType, ",") != "ALL,VOD" {
+		t.Errorf("%v: output doesn't match expected result", qm.StreamingType)
 	}
 
 	if qm.Metrics != "views,concurrent" {

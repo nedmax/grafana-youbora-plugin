@@ -3,18 +3,16 @@ import { DataQuery, DataSourceJsonData } from '@grafana/data';
 export interface MyQuery extends DataQuery {
   filter?: string;
   metrics?: string;
-  type?: string;
+  streamingType: string[];
 }
 
 export const defaultQuery: Partial<MyQuery> = {
   filter: '',
   metrics: 'views',
-  type: 'ALL',
+  streamingType: ['ALL'],
 };
 
-export const MyParams = ['filter', 'metrics', 'type'];
-
-export type StreamingType = 'ALL' | 'VOD' | 'LIVE';
+export const MyParams = ['filter', 'metrics', 'streamingType'];
 
 /**
  * These are options configured for each DataSource instance.

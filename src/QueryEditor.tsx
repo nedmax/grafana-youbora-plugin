@@ -1,7 +1,7 @@
 import { defaults } from 'lodash';
 
 import React, { PureComponent } from 'react';
-import { InlineFormLabel, Select } from '@grafana/ui';
+import { InlineFormLabel, InlineField, Select, MultiSelect } from '@grafana/ui';
 import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from './datasource';
 import { defaultQuery, MyDataSourceOptions, MyQuery } from './types';
@@ -20,7 +20,7 @@ const metricsOptions: Array<SelectableValue<string>> = [
   { label: 'Unique Views', value: 'uniques' },
 ];
 
-const typeOptions: Array<SelectableValue<string>> = [
+const streamingTypeOptions: Array<SelectableValue<string>> = [
   { label: 'All', value: 'ALL' },
   { label: 'VoD', value: 'VOD' },
   { label: 'Live', value: 'LIVE' },
@@ -39,10 +39,17 @@ export class QueryEditor extends PureComponent<Props> {
     onRunQuery();
   };
 
-  onTypeChange = (option: SelectableValue<string>) => {
+  onTypeChange = (options: SelectableValue<string>) => {
     const { onChange, query, onRunQuery } = this.props;
-    onChange({ ...query, type: option.value });
-    onRunQuery();
+
+    console.log('AQUI');
+    console.log(options);
+    if (options) {
+      const values: string[] = [];
+      options.forEach((option: { value: string }) => option.value && values.push(option.value));
+      onChange({ ...query, streamingType: values });
+      onRunQuery();
+    }
   };
 
   render() {
@@ -51,7 +58,6 @@ export class QueryEditor extends PureComponent<Props> {
     return (
       <>
         <div className="gf-form-inline">
-          <InlineFormLabel width={12}>&nbsp;</InlineFormLabel>
           <InlineFormLabel width={5}>Filter</InlineFormLabel>
           <Select
             isSearchable={true}
@@ -60,7 +66,7 @@ export class QueryEditor extends PureComponent<Props> {
             options={filterOptions}
             onChange={this.onFilterChange}
           />
-          <InlineFormLabel width={5}>Metrics</InlineFormLabel>
+          <InlineFormLabel width={6}>Metrics</InlineFormLabel>
           <Select
             isSearchable={true}
             width={33}
@@ -68,14 +74,15 @@ export class QueryEditor extends PureComponent<Props> {
             options={metricsOptions}
             onChange={this.onMetricsChange}
           />
-          <InlineFormLabel width={5}>Type</InlineFormLabel>
-          <Select
-            isSearchable={true}
-            width={33}
-            value={query.metrics || ''}
-            options={typeOptions}
-            onChange={this.onTypeChange}
-          />
+          <InlineField label="Streaming Type" labelWidth={14}>
+            <MultiSelect
+              isSearchable
+              isClearable
+              value={query.streamingType}
+              options={streamingTypeOptions}
+              onChange={this.onTypeChange}
+            />
+          </InlineField>
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>

@@ -6,5 +6,5 @@
     "maxDataPoints": 1732,
     "metrics": "views,concurrent",
     "refId": "A",
-    "type": "ALL,VOD"
+    "streamingType": ["ALL","VOD"]
 }

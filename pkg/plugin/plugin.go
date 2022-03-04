@@ -10,6 +10,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -168,7 +169,7 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body
 		"fromDate=%s&metrics=%s&type=%s&timezone=GMT&granularity=%s",
 		qm.FromDate,
 		qm.Metrics,
-		qm.Type,
+		strings.Join(qm.StreamingType, ","),
 		qm.Granularity,
 	)
 	if qm.ToDate != "" {
