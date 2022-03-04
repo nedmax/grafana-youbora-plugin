@@ -4,7 +4,7 @@
     "intervalMs": 1000,
     "key": "Q-60d70e26-7929-41b9-b1e1-9b26862771d6-0",
     "maxDataPoints": 1732,
-    "metrics": "views,concurrent",
+    "metrics": ["views","concurrent"],
     "refId": "A",
     "streamingType": ["ALL","VOD"]
 }

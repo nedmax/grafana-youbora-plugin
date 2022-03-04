@@ -53,6 +53,6 @@ type QueryModel struct {
 	ToDate        string
 	Filter        string   `json:"filter,omitempty"`
 	StreamingType []string `json:"streamingType"`
-	Metrics       string   `json:"metrics"`
+	Metrics       []string `json:"metrics"`
 	Granularity   string
 }

@@ -126,7 +126,7 @@ func TestParseQuery(t *testing.T) {
 		t.Errorf("%v: output doesn't match expected result", qm.StreamingType)
 	}
 
-	if qm.Metrics != "views,concurrent" {
+	if strings.Join(qm.Metrics, ",") != "views,concurrent" {
 		t.Errorf("%v: output doesn't match expected result", qm.Metrics)
 	}
 

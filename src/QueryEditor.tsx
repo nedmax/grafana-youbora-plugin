@@ -16,8 +16,29 @@ const filterOptions: Array<SelectableValue<string>> = [
 ];
 
 const metricsOptions: Array<SelectableValue<string>> = [
+  // Audience
   { label: 'Plays', value: 'views' },
+  { label: 'Plays Initiated', value: 'successfulPlays' },
+  { label: 'Concurrent Plays', value: 'concurrent' },
+  { label: 'Active Plays', value: 'activeSessions' },
   { label: 'Unique Views', value: 'uniques' },
+  { label: 'Subscribers', value: 'subscribers' },
+  { label: 'Effective Playtime', value: 'effectiveHours' },
+  { label: 'Avg. Effective Playtime', value: 'effectiveTime' },
+  { label: 'Traffic', value: 'traffic' },
+  { label: 'Avg. Playtime', value: 'playtime' },
+  { label: 'EBVS', value: 'exitsCount' },
+  { label: 'EBVS Ratio', value: 'exits' },
+  { label: 'EBVS excluding ad drops', value: 'ebvsNoAdsCount' },
+  { label: 'EBVS excluding ad drops Ratio', value: 'ebvsNoAds' },
+  // Quality
+  { label: 'Join Time', value: 'jointime' },
+  { label: 'Effective Buffer Ratio', value: 'effectiveBufferRatio' },
+  { label: 'Avg. Bitrate (Mbps)', value: 'bitratembps' },
+  // Errors
+  { label: 'Startup Error (#) (globo)', value: 'startupErrorCount_globo' },
+  { label: 'Startup Error (%) (globo)', value: 'startupError_globo' },
+  { label: 'In-Stream Error (globo)', value: 'inStreamError_globo' },
 ];
 
 const streamingTypeOptions: Array<SelectableValue<string>> = [
@@ -27,23 +48,26 @@ const streamingTypeOptions: Array<SelectableValue<string>> = [
 ];
 
 export class QueryEditor extends PureComponent<Props> {
-  onFilterChange = (option: SelectableValue<string>) => {
+  onFilterChanged = (option: SelectableValue<string>) => {
     const { onChange, query, onRunQuery } = this.props;
     onChange({ ...query, filter: option.value });
     onRunQuery();
   };
 
-  onMetricsChange = (option: SelectableValue<string>) => {
+  onMetricsChanged = (options: SelectableValue<string>) => {
     const { onChange, query, onRunQuery } = this.props;
-    onChange({ ...query, metrics: option.value });
-    onRunQuery();
+
+    if (options) {
+      const values: string[] = [];
+      options.forEach((option: { value: string }) => option.value && values.push(option.value));
+      onChange({ ...query, metrics: values });
+      onRunQuery();
+    }
   };
 
-  onTypeChange = (options: SelectableValue<string>) => {
+  onTypeChanged = (options: SelectableValue<string>) => {
     const { onChange, query, onRunQuery } = this.props;
 
-    console.log('AQUI');
-    console.log(options);
     if (options) {
       const values: string[] = [];
       options.forEach((option: { value: string }) => option.value && values.push(option.value));
@@ -64,23 +88,26 @@ export class QueryEditor extends PureComponent<Props> {
             width={33}
             value={query.filter || ''}
             options={filterOptions}
-            onChange={this.onFilterChange}
+            onChange={this.onFilterChanged}
           />
-          <InlineFormLabel width={6}>Metrics</InlineFormLabel>
-          <Select
-            isSearchable={true}
-            width={33}
-            value={query.metrics || ''}
-            options={metricsOptions}
-            onChange={this.onMetricsChange}
-          />
+
+          <InlineField label="Metrics" labelWidth={14}>
+            <MultiSelect
+              isSearchable
+              isClearable
+              value={query.metrics}
+              options={metricsOptions}
+              onChange={this.onMetricsChanged}
+            />
+          </InlineField>
+
           <InlineField label="Streaming Type" labelWidth={14}>
             <MultiSelect
               isSearchable
               isClearable
               value={query.streamingType}
               options={streamingTypeOptions}
-              onChange={this.onTypeChange}
+              onChange={this.onTypeChanged}
             />
           </InlineField>
           <div className="gf-form gf-form--grow">

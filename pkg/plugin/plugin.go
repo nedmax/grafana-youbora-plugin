@@ -141,8 +141,8 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 	var status = backend.HealthStatusOk
 	var message = "Data source is working"
 	var qm = &QueryModel{
-		Metrics:  "views",
 		FromDate: "last5minutes",
+		Metrics:  []string{"views"},
 	}
 
 	_, err := d.doRequest(ctx, qm)
@@ -168,7 +168,7 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body
 	orderedParams := fmt.Sprintf(
 		"fromDate=%s&metrics=%s&type=%s&timezone=GMT&granularity=%s",
 		qm.FromDate,
-		qm.Metrics,
+		strings.Join(qm.Metrics, ","),
 		strings.Join(qm.StreamingType, ","),
 		qm.Granularity,
 	)

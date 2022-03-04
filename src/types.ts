@@ -2,13 +2,13 @@ import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 export interface MyQuery extends DataQuery {
   filter?: string;
-  metrics?: string;
+  metrics: string[];
   streamingType: string[];
 }
 
 export const defaultQuery: Partial<MyQuery> = {
   filter: '',
-  metrics: 'views',
+  metrics: ['views'],
   streamingType: ['ALL'],
 };
 
