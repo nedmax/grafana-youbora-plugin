@@ -175,6 +175,9 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body
 	if qm.ToDate != "" {
 		orderedParams = orderedParams + fmt.Sprintf("&toDate=%s", qm.ToDate)
 	}
+	if qm.GroupBy != "" {
+		orderedParams = orderedParams + fmt.Sprintf("&groupBy=%s", qm.GroupBy)
+	}
 
 	baseParams := fmt.Sprintf("dateToken=%d&%s", expirationTime, orderedParams)
 	baseToken := fmt.Sprintf("%s?%s", basePath, baseParams)
