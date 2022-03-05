@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
+	"strings"
 	"testing"
 	"time"
 
@@ -90,7 +91,7 @@ func TestDoubleData(t *testing.T) {
 	}
 
 	if frames[0].Fields[0].At(0) != time.Unix(1646232180, 0) {
-		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[0].At(0), time.Unix(1646220720, 0))
+		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[0].At(0), time.Unix(1646232180, 0))
 	}
 
 	if frames[0].Fields[1].At(0) != float64(27585) {
@@ -103,6 +104,41 @@ func TestDoubleData(t *testing.T) {
 
 	if frames[0].Fields[2].Name != "Concurrent Plays" {
 		t.Errorf("%v: output doesn't match expected result", frames[0].Fields[2].Name)
+	}
+
+	if frames[0].Name != " | ALL" {
+		t.Errorf("%v: output doesn't match expected result", frames[0].Name)
+	}
+
+}
+
+func TestWithDimension(t *testing.T) {
+	b, err := ioutil.ReadFile("testdata/with_dimension.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var result plugin.YouboraResponse
+	err = json.Unmarshal(b, &result)
+	if err != nil {
+		t.Errorf("%v: error parsing JSON", string(b))
+	}
+
+	frames, err := plugin.ParseYouboraResponse(&result)
+	if err != nil {
+		t.Fatalf("%v: error parsing Youbora response", result)
+	}
+
+	if frames[0].Fields[0].At(0) != time.Unix(1646489220, 0) {
+		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[0].At(0), time.Unix(1646489220, 0))
+	}
+
+	if frames[0].Fields[1].At(0) != float64(23196) {
+		t.Errorf("%v != %v: output doesn't match expected result", frames[0].Fields[1].At(0), 23196)
+	}
+
+	if frames[0].Name != "Globo | ALL" {
+		t.Errorf("%v: output doesn't match expected result", frames[0].Name)
 	}
 
 }
@@ -121,11 +157,11 @@ func TestParseQuery(t *testing.T) {
 		t.Errorf("%v: error parsing JSON", string(b))
 	}
 
-	if qm.Type != "ALL,VOD" {
-		t.Errorf("%v: output doesn't match expected result", qm.Type)
+	if strings.Join(qm.StreamingType, ",") != "ALL,VOD" {
+		t.Errorf("%v: output doesn't match expected result", qm.StreamingType)
 	}
 
-	if qm.Metrics != "views,concurrent" {
+	if strings.Join(qm.Metrics, ",") != "views,concurrent" {
 		t.Errorf("%v: output doesn't match expected result", qm.Metrics)
 	}
 

@@ -46,4 +46,4 @@ This plugin enables Youbora API as a data source for Grafana.
 - [Metrics](https://documentation.npaw.com/npaw/docs/metrics)
 
 ## TODO
-- Add query editor selectors for metrics, type, groupby, etc
+- Add query editor selectors for metrics, groupby, etc

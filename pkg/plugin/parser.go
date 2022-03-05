@@ -13,7 +13,7 @@ import (
 func ParseYouboraResponse(yr *YouboraResponse) (frames data.Frames, err error) {
 
 	for i := 0; i < len(yr.Data); i++ {
-		frame := data.NewFrame(yr.Data[i].Type)
+		frame := data.NewFrame(fmt.Sprintf("%s | %s", yr.Data[i].Name, yr.Data[i].Type))
 
 		for k := 0; k < len(yr.Data[i].Metrics); k++ {
 			n := len(yr.Data[i].Metrics[k].Values[0].Points)

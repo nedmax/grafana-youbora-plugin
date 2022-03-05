@@ -10,6 +10,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -140,8 +141,8 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 	var status = backend.HealthStatusOk
 	var message = "Data source is working"
 	var qm = &QueryModel{
-		Metrics:  "views",
 		FromDate: "last5minutes",
+		Metrics:  []string{"views"},
 	}
 
 	_, err := d.doRequest(ctx, qm)
@@ -167,12 +168,15 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body
 	orderedParams := fmt.Sprintf(
 		"fromDate=%s&metrics=%s&type=%s&timezone=GMT&granularity=%s",
 		qm.FromDate,
-		qm.Metrics,
-		qm.Type,
+		strings.Join(qm.Metrics, ","),
+		strings.Join(qm.StreamingType, ","),
 		qm.Granularity,
 	)
 	if qm.ToDate != "" {
 		orderedParams = orderedParams + fmt.Sprintf("&toDate=%s", qm.ToDate)
+	}
+	if qm.GroupBy != "" {
+		orderedParams = orderedParams + fmt.Sprintf("&groupBy=%s", qm.GroupBy)
 	}
 
 	baseParams := fmt.Sprintf("dateToken=%d&%s", expirationTime, orderedParams)

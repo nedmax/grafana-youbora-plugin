@@ -1,3 +1,11 @@
+clean:
+	mage clean
+	rm -f dist
+
+test:
+	yarn test
+	mage test
+	
 setup:
 	yarn install
 	yarn build
