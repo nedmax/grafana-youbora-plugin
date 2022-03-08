@@ -13,9 +13,16 @@ import (
 func ParseYouboraResponse(yr *YouboraResponse) (frames data.Frames, err error) {
 
 	for i := 0; i < len(yr.Data); i++ {
-		frame := data.NewFrame(fmt.Sprintf("%s | %s", yr.Data[i].Name, yr.Data[i].Type))
+		var frameName string
+		if yr.Data[i].Name != "" {
+			frameName = fmt.Sprintf("%s | %s", yr.Data[i].Name, yr.Data[i].Type)
+		} else {
+			frameName = yr.Data[i].Type
+		}
+		frame := data.NewFrame(frameName)
 
 		for k := 0; k < len(yr.Data[i].Metrics); k++ {
+			fieldName := fmt.Sprintf("(%s)", yr.Data[i].Metrics[k].Label)
 			n := len(yr.Data[i].Metrics[k].Values[0].Points)
 			x := make([]time.Time, n)
 			y := make([]float64, n)
@@ -28,7 +35,7 @@ func ParseYouboraResponse(yr *YouboraResponse) (frames data.Frames, err error) {
 			if k == 0 {
 				frame.Fields = append(frame.Fields, data.NewField("time", nil, x))
 			}
-			frame.Fields = append(frame.Fields, data.NewField(yr.Data[i].Metrics[k].Label, nil, y))
+			frame.Fields = append(frame.Fields, data.NewField(fieldName, nil, y))
 		}
 
 		frames = append(frames, frame)
