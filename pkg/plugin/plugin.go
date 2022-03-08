@@ -2,15 +2,11 @@ package plugin
 
 import (
 	"context"
-	"crypto/md5"
 	"crypto/tls"
-	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -49,7 +45,7 @@ var httpClient = &http.Client{
 		MaxIdleConns:          100,
 		IdleConnTimeout:       90 * time.Second,
 	},
-	Timeout: time.Duration(time.Second * 5),
+	Timeout: time.Duration(time.Second * 20),
 }
 
 // NewYouboraDataSource creates a new datasource instance.
@@ -160,30 +156,7 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 }
 
 func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body []byte, err error) {
-
-	const ttl = 20 * 60 * 1000 // 20 minutes in milliseconds
-	expirationTime := (time.Now().UnixNano() / int64(time.Millisecond)) + ttl
-
-	basePath := fmt.Sprintf("/%s/data", d.account)
-	orderedParams := fmt.Sprintf(
-		"fromDate=%s&metrics=%s&type=%s&timezone=GMT&granularity=%s",
-		qm.FromDate,
-		strings.Join(qm.Metrics, ","),
-		strings.Join(qm.StreamingType, ","),
-		qm.Granularity,
-	)
-	if qm.ToDate != "" {
-		orderedParams = orderedParams + fmt.Sprintf("&toDate=%s", qm.ToDate)
-	}
-	if qm.GroupBy != "" {
-		orderedParams = orderedParams + fmt.Sprintf("&groupBy=%s", qm.GroupBy)
-	}
-
-	baseParams := fmt.Sprintf("dateToken=%d&%s", expirationTime, orderedParams)
-	baseToken := fmt.Sprintf("%s?%s", basePath, baseParams)
-	token := md5.Sum([]byte(baseToken + d.apikey))
-
-	url := fmt.Sprintf("%s%s?%s&token=%s", d.baseurl, basePath, baseParams, hex.EncodeToString(token[:]))
+	url := buildQuery(d, qm)
 	log.DefaultLogger.Debug("calling API", "url", url)
 
 	resp, err := httpClient.Get(url)
