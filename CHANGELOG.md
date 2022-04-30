@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.0.4
+Use Grafana httpclient lib.
 ## 1.0.3
 Improve query editor with selects.
 ## 1.0.2

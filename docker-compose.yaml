@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   grafana:
-    image: grafana/grafana:8.2.2
+    image: grafana/grafana:8.5.1
     restart: always
     ports:
       - 3000:3000
@@ -16,7 +16,7 @@ services:
       - ./:/var/lib/grafana/plugins/youbora-datasource
 
   console:
-    image: grafana/grafana:8.2.2
+    image: grafana/grafana:8.5.1
     restart: always
     ports:
       - 3000:3000

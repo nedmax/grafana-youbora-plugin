@@ -2,14 +2,13 @@ package plugin
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io"
-	"net"
-	"net/http"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 )
@@ -29,38 +28,30 @@ var (
 	_ instancemgmt.InstanceDisposer = (*YouboraDataSource)(nil)
 )
 
-var httpClient = &http.Client{
-	Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{
-			Renegotiation: tls.RenegotiateFreelyAsClient,
-		},
-		Proxy: http.ProxyFromEnvironment,
-		Dial: (&net.Dialer{
-			Timeout:   3 * time.Second,
-			KeepAlive: 3 * time.Second,
-			DualStack: true,
-		}).Dial,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-	},
-	Timeout: time.Duration(time.Second * 20),
-}
-
 // NewYouboraDataSource creates a new datasource instance.
 func NewYouboraDataSource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	var secureData = settings.DecryptedSecureJSONData
 	var jsondata JsonData
 
+	client, err := httpclient.New(httpclient.Options{
+		Timeouts: &httpclient.TimeoutOptions{
+			Timeout: 5 * time.Second,
+		},
+	})
+	if err != nil {
+		log.DefaultLogger.Error("failed to create HTTP client.", "error", err)
+	}
+
 	if err := json.Unmarshal(settings.JSONData, &jsondata); err != nil {
-		log.DefaultLogger.Warn("Error getting API key", "err", err)
+		log.DefaultLogger.Error("Error getting API key.", "error", err)
+		return nil, err
 	}
 
 	return &YouboraDataSource{
-		apikey:  secureData["apikey"],
-		baseurl: "https://api.youbora.com",
-		account: jsondata.Account,
+		apikey:     secureData["apikey"],
+		baseurl:    "https://api.youbora.com",
+		account:    jsondata.Account,
+		httpclient: client,
 	}, nil
 }
 
@@ -76,8 +67,6 @@ func (d *YouboraDataSource) Dispose() {
 // The QueryDataResponse contains a map of RefID to the response for each query, and each response
 // contains Frames ([]*Frame).
 func (d *YouboraDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
-	log.DefaultLogger.Info("QueryData called", "request", req)
-
 	// create response struct
 	response := backend.NewQueryDataResponse()
 
@@ -133,17 +122,25 @@ func (d *YouboraDataSource) query(ctx context.Context, pCtx backend.PluginContex
 // datasource configuration page which allows users to verify that
 // a datasource is working as expected.
 func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	log.DefaultLogger.Info("CheckHealth called", "request", req)
 	var status = backend.HealthStatusOk
+	yr := YouboraResponse{}
 	var message = "Data source is working"
 	var qm = &QueryModel{
-		FromDate: "last5minutes",
-		Metrics:  []string{"views"},
+		FromDate:      "last5minutes",
+		Metrics:       []string{"views"},
+		Granularity:   "minute",
+		StreamingType: []string{"ALL"},
 	}
 
-	_, err := d.doRequest(ctx, qm)
-
+	body, err := d.doRequest(ctx, qm)
 	if err != nil {
+		log.DefaultLogger.Debug("doRequest", "error", err)
+		status = backend.HealthStatusError
+		message = "error getting API version"
+		return nil, err
+	}
+	if err := json.Unmarshal(body, &yr); err != nil {
+		log.DefaultLogger.Debug("doRequest", "body", body)
 		status = backend.HealthStatusError
 		message = "error getting API version"
 		return nil, err
@@ -157,15 +154,23 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 
 func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body []byte, err error) {
 	url := buildQuery(d, qm)
-	log.DefaultLogger.Debug("calling API", "url", url)
+	log.DefaultLogger.Debug("calling Youbora's API.", "url", url)
 
-	resp, err := httpClient.Get(url)
+	rsp, err := d.httpclient.Get(url)
 	if err != nil {
+		log.DefaultLogger.Error("failed executing GET.", "error", err)
+
 		return body, err
 	}
+	defer rsp.Body.Close()
 
-	defer resp.Body.Close()
-	body, err = io.ReadAll(resp.Body)
+	if rsp.StatusCode > 399 {
+		return nil, fmt.Errorf("invalid HTTP response %v", rsp.Status)
+	}
 
-	return body, nil
+	if body, err = io.ReadAll(rsp.Body); err != nil {
+		return nil, err
+	}
+
+	return body, err
 }

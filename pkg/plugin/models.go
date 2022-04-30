@@ -1,5 +1,7 @@
 package plugin
 
+import "net/http"
+
 type YouboraResponse struct {
 	Messages []Message `json:"messages,omitempty"`
 	Data     []Datum   `json:"data,omitempty"`
@@ -39,9 +41,10 @@ type Value struct {
 }
 
 type YouboraDataSource struct {
-	apikey  string
-	baseurl string
-	account string
+	apikey     string
+	baseurl    string
+	account    string
+	httpclient *http.Client
 }
 
 type JsonData struct {
