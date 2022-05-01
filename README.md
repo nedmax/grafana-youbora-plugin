@@ -1,46 +1,40 @@
-# Grafana Data Source Plugin for NPAW's Youbora
+# Youbora data source for Grafana
+<img src="img/logo.png" width="64" style="float:right"/>
 
-[![Build](https://github.com/nedmax/grafana-youbora-plugin/workflows/CI/badge.svg)](https://github.com/nedmax/grafana-youbora-plugin/actions?query=workflow%3A%22CI%22)
+The Youbora data source plugin allows you to query and visualize Youbora data from within Grafana.
 
-This plugin enables Youbora API as a data source for Grafana.
+## Install the plugin
 
-## Getting started
+1. Navigate to [Youbora](https://grafana.com/grafana/plugins/nedimar-youbora-datasource/) plugin homepage.
+2. From the left-hand menu, click the **Install plugin** button.
 
-### Dependencies
+   The **Installation** tab is displayed.
 
-- Docker
-- Grafana >=7.0
-- Go 1.14+
-- Mage
-- NodeJS >=14
-- yarn
+### Verify that the plugin is installed
 
-1. Install dependencies
+1. In Grafana, navigate to **Configuration** > **Data sources**.
+2. From the top-right corner, click the **Add data source** button.
+3. Search for Youbora in the search field, and hover over the Youbora search result.
+4. Click the **Select** button for Google BigQuery. If you can click the **Select** button, then it is installed.
 
-   ```bash
-   make setup
-   ```
+## Configure the Youbora data source in Grafana
 
-2. Build plugin in development mode and run
+Follow [these instructions](https://grafana.com/docs/grafana/latest/datasources/add-a-data-source/) to add a new Youbora data source, and enter configuration options:
 
-   ```bash
-   make run
-   ```
+### Requirements
 
-3. Build plugin in production mode
+You will need an API key from Youbora. You can generate one at your instance web interface or ask for help.
 
-   ```bash
-   make build
-   ```
 
-## Grafana Plugin Development
+## Querying
 
-- [Build a data source backend plugin tutorial](https://grafana.com/tutorials/build-a-data-source-backend-plugin/)
-- [Grafana documentation](https://grafana.com/docs/)
-- [Grafana Tutorials](https://grafana.com/tutorials/) - Grafana Tutorials are step-by-step guides that help you make the most of Grafana
-- [Grafana UI Library](https://developers.grafana.com/ui) - UI components to help you build interfaces using Grafana Design System
+<img src="img/screenshot-edit1.png" />
 
-## Youbora API
+## Visualizing
 
-- [Analytics API](https://documentation.npaw.com/npaw-integration/reference/about-analytics-api)
-- [Metrics](https://documentation.npaw.com/npaw/docs/metrics)
+<img src="img/screenshot-dashboard1.png" />
+
+
+## Learn more
+
+- Youbora [API](https://documentation.npaw.com/npaw-integration/reference/about-data-collection).

@@ -1,4 +1,5 @@
-//+build mage
+//go:build mage
+// +build mage
 
 package main
 
@@ -8,10 +9,11 @@ import (
 	build "github.com/grafana/grafana-plugin-sdk-go/build"
 )
 
-// Hello prints a message (shows that you can define custom Mage targets).
-func Hello() {
-	fmt.Println("hello plugin developer!")
+// Build build for all archs
+func Build() {
+	fmt.Println("Build all archs!")
+	build.BuildAll()
 }
 
 // Default configures the default target.
-var Default = build.BuildAll
+var Default = Build
