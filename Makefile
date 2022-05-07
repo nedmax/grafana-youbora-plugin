@@ -1,3 +1,9 @@
+GRAFANA_PLUGIN_ID := $(shell cat src/plugin.json | jq -r .id)
+GRAFANA_PLUGIN_VERSION := $(shell cat package.json| jq -r '.version')
+GRAFANA_PLUGIN_TYPE := $(shell cat src/plugin.json | jq -r .type)
+
+MD5CMD ?= "md5"
+
 clean:
 	mage clean
 	rm -f dist
@@ -13,38 +19,29 @@ setup:
 	go mod tidy
 
 build:
-	yarn build
-	mage -v
+	@yarn build
+	@mage -v
 
 run: build
-	docker compose up grafana
+	@docker compose up grafana
 
 package_node:
-	yarn install --pure-lockfile
-	yarn build
+	@yarn install --pure-lockfile
+	@yarn build
 
-package_linux: package_node
-	mage build:linux
-	yarn sign
-	mv dist/ nedimar-youbora-datasource
-	zip nedimar-youbora-datasource-$(shell cat package.json| jq -r '.version').linux.zip nedimar-youbora-datasource -r
-	mv nedimar-youbora-datasource dist
-	mage clean
+check_os:
+	@if [ -z "${OS}" ]; then echo "OS not set. Please run \`make {linux,windows,darwin} package\`"; exit 1; fi ||:
 
-package_windows: package_node
-	mage build:windows
-	yarn sign
-	mv dist/ nedimar-youbora-datasource
-	zip nedimar-youbora-datasource-$(shell cat package.json| jq -r '.version').windows.zip nedimar-youbora-datasource -r
-	mv nedimar-youbora-datasource dist
-	mage clean
-
-package_darwin: package_node
-	mage build:darwin
-	yarn sign
-	mv dist/ nedimar-youbora-datasource
-	zip nedimar-youbora-datasource-$(shell cat package.json| jq -r '.version').darwin.zip nedimar-youbora-datasource -r
-	mv nedimar-youbora-datasource dist
-	mage clean
-
-package: package_linux package_windows package_darwin
+linux:
+	@:$(eval OS=linux)
+	@:$(eval GRAFANA_PLUGIN_ARTIFACT="${GRAFANA_PLUGIN_ID}-${GRAFANA_PLUGIN_VERSION}-${OS}.zip")
+	@:$(eval GRAFANA_PLUGIN_ARTIFACT_CHECKSUM="${GRAFANA_PLUGIN_ARTIFACT}.md5")
+	
+package: check_os package_node
+	@mage build:${OS}
+	@yarn sign
+	@mv dist/ ${GRAFANA_PLUGIN_ID}
+	@zip ${GRAFANA_PLUGIN_ARTIFACT} ${GRAFANA_PLUGIN_ID} -r
+	@$(MD5CMD) ${GRAFANA_PLUGIN_ARTIFACT} > ${GRAFANA_PLUGIN_ARTIFACT_CHECKSUM}
+	@plugincheck ${GRAFANA_PLUGIN_ARTIFACT}
+	@rm -r ${GRAFANA_PLUGIN_ID}

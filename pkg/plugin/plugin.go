@@ -134,16 +134,22 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 
 	body, err := d.doRequest(ctx, qm)
 	if err != nil {
-		log.DefaultLogger.Debug("doRequest", "error", err)
+		log.DefaultLogger.Error("doRequest", "error", err)
 		status = backend.HealthStatusError
-		message = "error getting API version"
-		return nil, err
+		message = "error getting API data"
+		return &backend.CheckHealthResult{
+			Status:  status,
+			Message: message,
+		}, err
 	}
 	if err := json.Unmarshal(body, &yr); err != nil {
-		log.DefaultLogger.Debug("doRequest", "body", body)
+		log.DefaultLogger.Error("doRequest", "body", body)
 		status = backend.HealthStatusError
-		message = "error getting API version"
-		return nil, err
+		message = "error parsing API response"
+		return &backend.CheckHealthResult{
+			Status:  status,
+			Message: message,
+		}, nil
 	}
 
 	return &backend.CheckHealthResult{
@@ -154,7 +160,6 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 
 func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body []byte, err error) {
 	url := buildQuery(d, qm)
-	log.DefaultLogger.Debug("calling Youbora's API.", "url", url)
 
 	rsp, err := d.httpclient.Get(url)
 	if err != nil {
