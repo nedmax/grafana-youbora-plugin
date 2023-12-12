@@ -1,6 +1,6 @@
 {
   "name": "nedimar-youbora-datasource",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "NPAW's Youbora data source plugin",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
