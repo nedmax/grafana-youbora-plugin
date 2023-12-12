@@ -1,6 +1,6 @@
 # Grafana Data Source Plugin for NPAW's Youbora
 
-[![Build](https://github.com/nedmax/grafana-youbora-plugin/workflows/CI/badge.svg)](https://github.com/nedmax/grafana-youbora-plugin/actions?query=workflow%3A%22CI%22)
+[![Build](https://github.com/globocom/grafana-youbora-plugin/workflows/CI/badge.svg)](https://github.com/globocom/grafana-youbora-plugin/actions?query=workflow%3A%22CI%22)
 
 This plugin enables Youbora API as a data source for Grafana.
 

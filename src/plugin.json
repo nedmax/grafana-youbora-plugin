@@ -10,7 +10,7 @@
     "description": "NPAW's Youbora data source plugin",
     "author": {
       "name": "Nedimar Paulo Turatti",
-      "url": "https://github.com/nedmax/grafana-youbora-plugin"
+      "url": "https://github.com/globocom/grafana-youbora-plugin"
     },
     "keywords": [
       "youbora",
@@ -24,7 +24,7 @@
     "links": [
       {
         "name": "Website",
-        "url": "https://github.com/nedmax/grafana-youbora-plugin"
+        "url": "https://github.com/globocom/grafana-youbora-plugin"
       },
       {
         "name": "License",
