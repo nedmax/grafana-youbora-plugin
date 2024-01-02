@@ -3,6 +3,7 @@
 ## 1.0.5
 
 - Fix default granulatiry.
+- Alerting true.
 
 ## 1.0.4
 

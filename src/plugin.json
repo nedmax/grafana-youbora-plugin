@@ -5,6 +5,7 @@
   "id": "nedimar-youbora-datasource",
   "metrics": true,
   "backend": true,
+  "alerting": true,
   "executable": "gpx_youbora",
   "info": {
     "description": "NPAW's Youbora data source plugin",
