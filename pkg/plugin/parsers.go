@@ -55,10 +55,10 @@ func ParseQuery(dq backend.DataQuery, qm *QueryModel) error {
 
 	// setup granularity.
 	qm.Granularity = "minute"
-	if dq.Interval.Minutes() > 120 {
+	if dq.Interval.Minutes() > 2 {
 		qm.Granularity = "hour"
 	}
-	if dq.Interval.Hours() > 48 {
+	if dq.Interval.Hours() > 2 {
 		qm.Granularity = "day"
 	}
 

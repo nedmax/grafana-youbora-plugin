@@ -22,7 +22,11 @@ build:
 	@yarn build
 	@mage -v
 
-run: build
+build-with-docker:
+	@docker compose run --remove-orphans go-builder
+	@docker compose run --remove-orphans js-builder 
+
+run:
 	@docker compose up grafana
 
 package_node:

@@ -162,6 +162,8 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body
 	url := buildQuery(d, qm)
 
 	rsp, err := d.httpclient.Get(url)
+	log.DefaultLogger.Debug("DEBUG URL", "url", url)
+
 	if err != nil {
 		log.DefaultLogger.Error("failed executing GET.", "error", err)
 
@@ -169,12 +171,17 @@ func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body
 	}
 	defer rsp.Body.Close()
 
-	if rsp.StatusCode > 399 {
-		return nil, fmt.Errorf("invalid HTTP response %v", rsp.Status)
-	}
-
 	if body, err = io.ReadAll(rsp.Body); err != nil {
 		return nil, err
+	}
+
+	if rsp.StatusCode > 399 {
+		var parsed map[string]interface{}
+		err := json.Unmarshal(body, &parsed)
+		if err != nil {
+			return nil, fmt.Errorf("invalid HTTP response %v (invalid response json)", rsp.Status)
+		}
+		return nil, fmt.Errorf("invalid API request: %v", parsed)
 	}
 
 	return body, err

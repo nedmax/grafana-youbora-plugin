@@ -11,7 +11,7 @@ import (
 
 // Build build for all archs
 func Build() {
-	fmt.Println("Build all archs!")
+	fmt.Println("Building plugin")
 	build.BuildAll()
 }
 

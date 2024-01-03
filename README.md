@@ -1,5 +1,6 @@
 # Youbora data source for Grafana
-<img src="img/logo.png" width="64" style="float:right"/>
+
+<img src="src/img/logo.png" width="64" style="float:right"/>
 
 The Youbora data source plugin allows you to query and visualize Youbora data from within Grafana.
 
@@ -25,15 +26,13 @@ Follow [these instructions](https://grafana.com/docs/grafana/latest/datasources/
 
 You will need an API key from Youbora. You can generate one at your instance web interface or ask for help.
 
-
 ## Querying
 
-<img src="img/screenshot-edit1.png" />
+<img src="src/img/screenshot-edit1.png" />
 
 ## Visualizing
 
-<img src="img/screenshot-dashboard1.png" />
-
+<img src="src/img/screenshot-dashboard1.png" />
 
 ## Learn more
 

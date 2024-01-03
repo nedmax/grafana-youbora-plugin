@@ -1,0 +1,21 @@
+# syntax=docker/dockerfile:1
+
+# Node build
+ARG BASE_IMAGE=alpine:3.18.3
+ARG JS_IMAGE=node:16-alpine3.18
+ARG JS_PLATFORM=linux/amd64
+ARG GO_IMAGE=golang:1.16
+
+FROM ${GO_IMAGE} as go-builder-1
+
+WORKDIR /tmp/grafana
+
+COPY go.* ./
+COPY Magefile.go .
+COPY pkg pkg
+COPY src src
+
+RUN go mod tidy
+
+RUN git clone https://github.com/magefile/mage
+RUN cd mage && go run bootstrap.go && go install

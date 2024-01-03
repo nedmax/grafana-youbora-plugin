@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+
+# Node build
+ARG BASE_IMAGE=alpine:3.18.3
+ARG JS_IMAGE=node:16-alpine3.18
+ARG JS_PLATFORM=linux/amd64
+ARG GO_IMAGE=golang:1.16
+
+ARG GO_SRC=go-builder
+ARG JS_SRC=js-builder
+
+FROM --platform=${JS_PLATFORM} ${JS_IMAGE} as js-builder-1
+
+WORKDIR /tmp/grafana
+
+COPY package.json yarn.lock ./
+RUN yarn install --immutable
+
+COPY tsconfig.json .prettierrc.js  ./
+COPY img img
+COPY src src
+COPY README.md LICENSE CHANGELOG.md .
+
+ENV NODE_ENV production
