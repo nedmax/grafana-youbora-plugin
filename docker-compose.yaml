@@ -13,7 +13,7 @@ services:
       GF_LOG_LEVEL: "debug"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./:/var/lib/grafana/plugins/globocom-youbora-datasource
+      - ./:/var/lib/grafana/plugins/nedimar-youbora-datasource
 
   js-builder:
     build:
@@ -41,7 +41,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./:/var/lib/grafana/plugins/youbora-datasource
+      - ./:/var/lib/grafana/plugins/nedimar-youbora-datasource
     environment:
       GF_DEFAULT_APP_MODE: "development"
     entrypoint: /bin/sh -c

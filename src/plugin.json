@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
   "type": "datasource",
   "name": "Youbora",
-  "id": "globocom-youbora-datasource",
+  "id": "nedimar-youbora-datasource",
   "metrics": true,
   "backend": true,
   "alerting": true,
