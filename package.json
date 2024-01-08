@@ -1,6 +1,6 @@
 {
   "name": "globocom-youbora-datasource",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "NPAW's Youbora data source plugin",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
