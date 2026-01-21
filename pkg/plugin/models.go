@@ -48,7 +48,8 @@ type YouboraDataSource struct {
 }
 
 type JsonData struct {
-	Account string `json:"account"`
+	Account        string `json:"account"`
+	TimeoutSeconds int    `json:"timeoutSeconds,omitempty"`
 }
 
 type QueryModel struct {
@@ -56,6 +57,7 @@ type QueryModel struct {
 	ToDate        string
 	FilterBy      string   `json:"filterBy,omitempty"`
 	FilterValue   string   `json:"filterValue,omitempty"`
+	FilterIsRegex bool     `json:"filterIsRegex,omitempty"`
 	GroupBy       string   `json:"groupBy,omitempty"`
 	StreamingType []string `json:"streamingType"`
 	Metrics       []string `json:"metrics"`

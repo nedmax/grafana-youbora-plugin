@@ -19,6 +19,17 @@ export class ConfigEditor extends PureComponent<Props, State> {
     onOptionsChange({ ...options, jsonData });
   };
 
+  onTimeoutChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const value = Number(event.target.value);
+    const timeoutSeconds = Number.isFinite(value) ? value : undefined;
+    const jsonData = {
+      ...options.jsonData,
+      timeoutSeconds,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
   // Secure field (only sent to the backend)
   onAPIKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
@@ -60,6 +71,19 @@ export class ConfigEditor extends PureComponent<Props, State> {
             onChange={this.onAccountChange}
             value={jsonData.account || ''}
             placeholder="Your account identifier at Youbora"
+          />
+        </div>
+
+        <div className="gf-form">
+          <FormField
+            label="Timeout (s)"
+            labelWidth={6}
+            inputWidth={20}
+            type="number"
+            min={1}
+            onChange={this.onTimeoutChange}
+            value={jsonData.timeoutSeconds ?? 5}
+            placeholder="HTTP request timeout in seconds"
           />
         </div>
 

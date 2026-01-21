@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.8
+
+- Change API authentication to HTTP header.
+- Add configurable API timeout.
+- Add Resource Domain dimension.
+- Add filter match by regexp.
+
 ## 1.0.7
 
 - Fix default granulatiry.

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -33,18 +34,23 @@ func NewYouboraDataSource(settings backend.DataSourceInstanceSettings) (instance
 	var secureData = settings.DecryptedSecureJSONData
 	var jsondata JsonData
 
+	if err := json.Unmarshal(settings.JSONData, &jsondata); err != nil {
+		log.DefaultLogger.Error("Error getting API key.", "error", err)
+		return nil, err
+	}
+
+	timeout := 5 * time.Second
+	if jsondata.TimeoutSeconds > 0 {
+		timeout = time.Duration(jsondata.TimeoutSeconds) * time.Second
+	}
+
 	client, err := httpclient.New(httpclient.Options{
 		Timeouts: &httpclient.TimeoutOptions{
-			Timeout: 5 * time.Second,
+			Timeout: timeout,
 		},
 	})
 	if err != nil {
 		log.DefaultLogger.Error("failed to create HTTP client.", "error", err)
-	}
-
-	if err := json.Unmarshal(settings.JSONData, &jsondata); err != nil {
-		log.DefaultLogger.Error("Error getting API key.", "error", err)
-		return nil, err
 	}
 
 	return &YouboraDataSource{
@@ -160,8 +166,15 @@ func (d *YouboraDataSource) CheckHealth(ctx context.Context, req *backend.CheckH
 
 func (d *YouboraDataSource) doRequest(ctx context.Context, qm *QueryModel) (body []byte, err error) {
 	url := buildQuery(d, qm)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	if d.apikey != "" {
+		req.Header.Set("npaw-api-key", d.apikey)
+	}
 
-	rsp, err := d.httpclient.Get(url)
+	rsp, err := d.httpclient.Do(req)
 	log.DefaultLogger.Debug("DEBUG URL", "url", url)
 
 	if err != nil {
