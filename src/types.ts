@@ -3,6 +3,7 @@ import { DataQuery, DataSourceJsonData } from '@grafana/data';
 export interface MyQuery extends DataQuery {
   filterBy?: string;
   filterValue?: string;
+  filterIsRegex?: boolean;
   groupBy?: string;
   metrics: string[];
   streamingType: string[];
@@ -11,6 +12,7 @@ export interface MyQuery extends DataQuery {
 export const defaultQuery: Partial<MyQuery> = {
   filterBy: '',
   filterValue: '',
+  filterIsRegex: false,
   groupBy: '',
   metrics: ['views'],
   streamingType: ['ALL'],

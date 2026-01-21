@@ -1,7 +1,7 @@
 import { defaults } from 'lodash';
 
 import React, { PureComponent } from 'react';
-import { InlineFormLabel, InlineField, Select, MultiSelect, Input } from '@grafana/ui';
+import { InlineFormLabel, InlineField, Select, MultiSelect, Input, RadioButtonGroup } from '@grafana/ui';
 import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from './datasource';
 import { defaultQuery, MyDataSourceOptions, MyQuery } from './types';
@@ -19,6 +19,7 @@ const dimensionOptions: Array<SelectableValue<string>> = [
   { label: 'ASN', value: 'asn' },
   { label: 'Connection Type', value: 'connectiontype' },
   { label: 'CDN', value: 'cdn' },
+  { label: 'Resource Domain', value: 'media_resource_domain' },
   // Device
   { label: 'Device Type', value: 'device_type' },
   { label: 'Device Vendor', value: 'device_vendor' },
@@ -95,6 +96,12 @@ export class QueryEditor extends PureComponent<Props> {
     onRunQuery();
   };
 
+  onFilterRegexChanged = (value: string) => {
+    const { onChange, query, onRunQuery } = this.props;
+    onChange({ ...query, filterIsRegex: value === 'regex' });
+    onRunQuery();
+  };
+
   onGroupByChanged = (option: SelectableValue<string>) => {
     const { onChange, query, onRunQuery } = this.props;
     onChange({ ...query, groupBy: option.value });
@@ -139,6 +146,16 @@ export class QueryEditor extends PureComponent<Props> {
           />
           <InlineField label="value">
             <Input type="text" value={query.filterValue || ''} onChange={this.onFilterValueChanged} />
+          </InlineField>
+          <InlineField label="Filter Match" labelWidth={10} grow>
+            <RadioButtonGroup
+              options={[
+                { label: 'Literal', value: 'literal' },
+                { label: 'Regex', value: 'regex' },
+              ]}
+              value={query.filterIsRegex ? 'regex' : 'literal'}
+              onChange={this.onFilterRegexChanged}
+            />
           </InlineField>
         </div>
         <div className="gf-form-inline">

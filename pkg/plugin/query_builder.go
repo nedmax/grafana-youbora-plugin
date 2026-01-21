@@ -21,11 +21,16 @@ func buildQuery(d *YouboraDataSource, qm *QueryModel) string {
 		params.Add("groupBy", qm.GroupBy)
 	}
 	if qm.FilterBy != "" && qm.FilterValue != "" {
+		filterField := qm.FilterBy
+		if qm.FilterIsRegex {
+			filterField = fmt.Sprintf("%s*", qm.FilterBy)
+		}
 		params.Add("filter", fmt.Sprintf(
-			"[{\"name\":\"%s=%s\",\"rules\":{\"%s\":[\"%s\"]}}]",
-			qm.FilterBy,
+			"[{\"%s\":\"%s=%s\",\"rules\":{\"%s\":[\"%s\"]}}]",
+			"name",
+			filterField,
 			qm.FilterValue,
-			qm.FilterBy,
+			filterField,
 			qm.FilterValue,
 		))
 	}
