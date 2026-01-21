@@ -48,7 +48,8 @@ type YouboraDataSource struct {
 }
 
 type JsonData struct {
-	Account string `json:"account"`
+	Account        string `json:"account"`
+	TimeoutSeconds int    `json:"timeoutSeconds,omitempty"`
 }
 
 type QueryModel struct {

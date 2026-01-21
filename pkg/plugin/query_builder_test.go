@@ -1,9 +1,6 @@
 package plugin
 
-import (
-	"strings"
-	"testing"
-)
+import "testing"
 
 func Test_buildQuery(t *testing.T) {
 	type args struct {
@@ -55,8 +52,6 @@ func Test_buildQuery(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := buildQuery(tt.args.d, tt.args.qm)
-			i := strings.Index(got, "&dateToken")
-			got = got[:i]
 			if got != tt.want {
 				t.Errorf("buildQuery() = %v, want %v", got, tt.want)
 			}

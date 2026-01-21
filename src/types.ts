@@ -23,6 +23,7 @@ export const MyParams = ['filter', 'metrics', 'streamingType'];
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
   account?: string;
+  timeoutSeconds?: number;
 }
 
 /**
